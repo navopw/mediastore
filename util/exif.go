@@ -2,7 +2,7 @@ package util
 
 import (
 	"bytes"
-	"github.com/navopw/photostore/model"
+	"github.com/navopw/mediastore/model"
 	"github.com/pocketbase/pocketbase/tools/types"
 	"github.com/rwcarlsen/goexif/exif"
 	"strings"

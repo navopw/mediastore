@@ -2,9 +2,9 @@ package routes
 
 import (
 	"github.com/labstack/echo/v5"
-	"github.com/navopw/photostore/model"
-	"github.com/navopw/photostore/service"
-	"github.com/navopw/photostore/util"
+	"github.com/navopw/mediastore/model"
+	"github.com/navopw/mediastore/service"
+	"github.com/navopw/mediastore/util"
 	"github.com/pocketbase/dbx"
 	"github.com/pocketbase/pocketbase/apis"
 	"github.com/pocketbase/pocketbase/models"
