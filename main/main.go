@@ -39,7 +39,14 @@ func main() {
 	app := pocketbase.New()
 
 	// S3
-	ConfigureS3ByEnv(app)
+	s3Config := app.Settings().S3
+	s3Config.Enabled = true
+	s3Config.Bucket = env.EnvironmentConfig.MediaBucket
+	s3Config.Region = env.EnvironmentConfig.AwsRegion
+	s3Config.Endpoint = env.EnvironmentConfig.S3Endpoint
+	s3Config.AccessKey = env.EnvironmentConfig.AwsAccessKeyId
+	s3Config.Secret = env.EnvironmentConfig.AwsSecretAccessKey
+	s3Config.ForcePathStyle = true
 
 	fileSystem, fileSystemError := app.NewFilesystem()
 	if fileSystemError != nil {
@@ -58,6 +65,7 @@ func main() {
 		}
 		e.Router.Add(http.MethodPost, "/api/media", routes.MediaCreateHandler, middlewares...)
 		e.Router.Add(http.MethodGet, "/api/media", routes.MediaGetHandler, middlewares...)
+		e.Router.Add(http.MethodDelete, "/api/media", routes.MediaDeleteHandler, middlewares...)
 		e.Router.Add(http.MethodGet, "/api/media/preview", routes.MediaPreviewHandler, middlewares...)
 		e.Router.Add(http.MethodGet, "/api/media/list", routes.MediaListHandler, middlewares...)
 		return nil
@@ -70,17 +78,6 @@ func main() {
 	}
 }
 
-func ConfigureS3ByEnv(pb *pocketbase.PocketBase) {
-	s3Config := pb.Settings().S3
-	s3Config.Enabled = true
-	s3Config.Bucket = env.EnvironmentConfig.MediaBucket
-	s3Config.Region = env.EnvironmentConfig.AwsRegion
-	s3Config.Endpoint = env.EnvironmentConfig.S3Endpoint
-	s3Config.AccessKey = env.EnvironmentConfig.AwsAccessKeyId
-	s3Config.Secret = env.EnvironmentConfig.AwsSecretAccessKey
-	s3Config.ForcePathStyle = true
-}
-
 func RegisterHooks(pb *pocketbase.PocketBase) {
 	pb.OnModelBeforeCreate().Add(func(e *core.ModelEvent) error {
 		marshal, err := json.Marshal(e.Model)
@@ -89,6 +86,17 @@ func RegisterHooks(pb *pocketbase.PocketBase) {
 		}
 
 		log.Print("Created model ", e.Model.TableName(), " "+string(marshal))
+
+		return nil
+	})
+
+	pb.OnModelBeforeDelete().Add(func(e *core.ModelEvent) error {
+		marshal, err := json.Marshal(e.Model)
+		if err != nil {
+			return err
+		}
+
+		log.Print("Deleted model ", e.Model.TableName(), " "+string(marshal))
 
 		return nil
 	})

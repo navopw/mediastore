@@ -1,7 +1,7 @@
 # MediaStore
 
 ## Install
-`go install github.com/navopw/mediastore@v1.0.0`
+`go build -o mediastore_bin github.com/navopw/mediastore/main`
 
 ## Requirements
 
