@@ -1,4 +1,4 @@
-module github.com/navopw/photostore
+module github.com/navopw/mediastore
 
 go 1.19
 
