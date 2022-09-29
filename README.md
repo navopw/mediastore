@@ -1,4 +1,4 @@
-# Photostore
+# MediaStore
 
 ## Requirements
 
