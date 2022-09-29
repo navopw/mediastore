@@ -1,4 +1,4 @@
-package util
+package mediahandler
 
 import (
 	"bytes"
@@ -8,6 +8,7 @@ import (
 	"strings"
 )
 
+// TODO: Heic support
 func ExtractExifData(byteArray []byte, media *model.Media) error {
 	// Decode
 	decoded, decodeError := exif.Decode(bytes.NewReader(byteArray))

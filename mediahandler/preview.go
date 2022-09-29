@@ -1,9 +1,10 @@
-package util
+package mediahandler
 
 import (
 	"bytes"
 	"errors"
 	"fmt"
+	"github.com/davidbyttow/govips/v2/vips"
 	"github.com/google/uuid"
 	"github.com/h2non/bimg"
 	ffmpeg_go "github.com/u2takey/ffmpeg-go"
@@ -64,24 +65,33 @@ func ExtractPreviewByMime(byteArray []byte, mime string) ([]byte, error) {
 		// Crop
 		previewImage := bimg.NewImage(videoPreviewBytes)
 		return previewImage.Process(bimg.Options{
-			Width:       400,
-			Height:      400,
+			Width:       500,
+			Height:      500,
 			Crop:        true,
-			Quality:     40,
+			Quality:     60,
 			Compression: 50,
 		})
 	}
 
 	// Image preview
-	// Low quality
 	if IsImage(mime) {
-		previewImage := bimg.NewImage(byteArray)
+		// Vips: Any format to Jpeg
+		image, err := vips.NewImageFromBuffer(byteArray)
+		if err != nil {
+			return nil, err
+		}
 
-		return previewImage.Process(bimg.Options{
-			Width:       400,
-			Height:      400,
+		jpegBuffer, _, err := image.ExportJpeg(vips.NewJpegExportParams())
+		if err != nil {
+			return nil, err
+		}
+
+		// bimg: Resize, crop and compress
+		return bimg.NewImage(jpegBuffer).Process(bimg.Options{
+			Width:       500,
+			Height:      500,
 			Crop:        true,
-			Quality:     40,
+			Quality:     60,
 			Compression: 50,
 		})
 	}

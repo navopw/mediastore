@@ -4,6 +4,7 @@ go 1.18
 
 require (
 	github.com/caarlos0/env v3.5.0+incompatible
+	github.com/davidbyttow/govips/v2 v2.11.0
 	github.com/google/uuid v1.3.0
 	github.com/h2non/bimg v1.1.9
 	github.com/labstack/echo/v5 v5.0.0-20220201181537-ed2888cfa198

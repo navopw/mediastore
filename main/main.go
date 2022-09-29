@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"github.com/davidbyttow/govips/v2/vips"
 	"github.com/labstack/echo/v5"
 	"github.com/navopw/mediastore/env"
 	_ "github.com/navopw/mediastore/migrations"
@@ -32,6 +33,10 @@ func main() {
 	if !env.EnvironmentConfig.StructLog {
 		log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 	}
+
+	// Libvips
+	vips.Startup(nil)
+	defer vips.Shutdown()
 
 	// Exif parser
 	exif.RegisterParsers(mknote.All...)
@@ -66,6 +71,7 @@ func main() {
 		e.Router.Add(http.MethodPost, "/api/media", routes.MediaCreateHandler, middlewares...)
 		e.Router.Add(http.MethodGet, "/api/media", routes.MediaGetHandler, middlewares...)
 		e.Router.Add(http.MethodDelete, "/api/media", routes.MediaDeleteHandler, middlewares...)
+		e.Router.Add(http.MethodGet, "/api/media/totalsize", routes.MediaTotalSizeHandler, middlewares...)
 		e.Router.Add(http.MethodGet, "/api/media/preview", routes.MediaPreviewHandler, middlewares...)
 		e.Router.Add(http.MethodGet, "/api/media/list", routes.MediaListHandler, middlewares...)
 		return nil

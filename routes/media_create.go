@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v5"
+	"github.com/navopw/mediastore/mediahandler"
 	"github.com/navopw/mediastore/model"
 	"github.com/navopw/mediastore/service"
 	"github.com/navopw/mediastore/util"
@@ -38,7 +39,15 @@ func MediaCreateHandler(c echo.Context) error {
 		})
 	}
 
+	// Check supported mime
 	mime := formFile.Header.Get("Content-Type")
+
+	if !mediahandler.IsSupported(mime) {
+		return c.JSON(http.StatusBadRequest, util.ErrorResponse{
+			Message: "unsupported mime type",
+			Error:   mime,
+		})
+	}
 
 	// File get bytes
 	byteArray, byteReadError := io.ReadAll(file)
@@ -71,7 +80,7 @@ func MediaCreateHandler(c echo.Context) error {
 
 	// Compress file
 	log.Print("Compressing file...")
-	compressedBytes := util.Compress(byteArray, mime)
+	compressedBytes := mediahandler.Compress(byteArray, mime)
 
 	// Construct Media record
 	media := model.Media{
@@ -79,7 +88,7 @@ func MediaCreateHandler(c echo.Context) error {
 		Hash:     hashString,
 		Name:     formFile.Filename,
 		Mime:     mime,
-		FileSize: 1337,
+		FileSize: float64(len(byteArray)),
 	}
 	media.Id = uuid.NewString()
 	media.MarkAsNew()
@@ -96,7 +105,7 @@ func MediaCreateHandler(c echo.Context) error {
 
 	// Preview
 	log.Print("Extracting preview...")
-	previewBytes, previewExtractError := util.ExtractPreviewByMime(compressedBytes, mime)
+	previewBytes, previewExtractError := mediahandler.ExtractPreviewByMime(compressedBytes, mime)
 	if previewExtractError != nil {
 		return c.JSON(http.StatusBadRequest, util.ErrorResponse{
 			Message: "failed to extract preview",
@@ -120,7 +129,7 @@ func MediaCreateHandler(c echo.Context) error {
 
 	// Save exif data into media
 	log.Print("Extracting exif...")
-	exifError := util.ExtractExifData(byteArray, &media)
+	exifError := mediahandler.ExtractExifData(byteArray, &media)
 	if exifError == nil {
 		log.Print("Exif data found")
 	}

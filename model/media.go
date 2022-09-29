@@ -11,10 +11,10 @@ type Media struct {
 	UserId string `db:"user_id" json:"user_id"`
 
 	// Media data
-	Hash     string `db:"hash" json:"hash"`
-	Name     string `db:"name" json:"name"`
-	Mime     string `db:"mime" json:"mime"`
-	FileSize int64  `db:"file_size" json:"file_size"`
+	Hash     string  `db:"hash" json:"hash"`
+	Name     string  `db:"name" json:"name"`
+	Mime     string  `db:"mime" json:"mime"`
+	FileSize float64 `db:"file_size" json:"file_size"`
 
 	// Video Preview image (S3 key)
 	PreviewID string `db:"preview_id" json:"preview_id"`
