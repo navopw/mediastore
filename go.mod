@@ -1,6 +1,6 @@
 module github.com/navopw/mediastore
 
-go 1.19
+go 1.18
 
 require (
 	github.com/caarlos0/env v3.5.0+incompatible
