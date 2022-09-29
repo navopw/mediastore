@@ -10,6 +10,7 @@ import (
 	"github.com/pocketbase/pocketbase"
 	"github.com/pocketbase/pocketbase/apis"
 	"github.com/pocketbase/pocketbase/core"
+	"github.com/pocketbase/pocketbase/tools/filesystem"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/rwcarlsen/goexif/exif"
@@ -39,19 +40,18 @@ func main() {
 	app := pocketbase.New()
 
 	// S3
-	s3Config := app.Settings().S3
-	s3Config.Enabled = true
-	s3Config.Bucket = env.EnvironmentConfig.MediaBucket
-	s3Config.Region = env.EnvironmentConfig.AwsRegion
-	s3Config.Endpoint = env.EnvironmentConfig.S3Endpoint
-	s3Config.AccessKey = env.EnvironmentConfig.AwsAccessKeyId
-	s3Config.Secret = env.EnvironmentConfig.AwsSecretAccessKey
-	s3Config.ForcePathStyle = true
-
-	fileSystem, fileSystemError := app.NewFilesystem()
-	if fileSystemError != nil {
-		panic(fileSystemError)
+	fileSystem, err := filesystem.NewS3(
+		env.EnvironmentConfig.MediaBucket,
+		env.EnvironmentConfig.AwsRegion,
+		env.EnvironmentConfig.S3Endpoint,
+		env.EnvironmentConfig.AwsAccessKeyId,
+		env.EnvironmentConfig.AwsSecretAccessKey,
+		true,
+	)
+	if err != nil {
+		panic(err)
 	}
+
 	service.FileSystem = fileSystem
 
 	// Hook
